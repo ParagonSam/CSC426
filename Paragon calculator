@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUI Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .app-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        #calc-display {
+            width: 100%;
+            height: 50px;
+            font-size: 1.5rem;
+            text-align: right;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: #f9fbfc;
+            color: #333;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-grid button {
+            padding: 15px 0;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calc-grid button:hover {
+            background-color: #dee2e6;
+        }
+
+        .calc-grid .btn-op {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            font-weight: bold;
+        }
+
+        .calc-grid .btn-op:hover {
+            background-color: #bbdefb;
+        }
+
+        .calc-grid .btn-clear {
+            background-color: #ffebee;
+            color: #c62828;
+            font-weight: bold;
+            grid-column: span 2;
+        }
+
+        .calc-grid .btn-clear:hover {
+            background-color: #ffcdd2;
+        }
+
+        .calc-grid .btn-equal {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+            grid-column: span 2;
+        }
+
+        .calc-grid .btn-equal:hover {
+            background-color: #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h2>Calculator</h2>
+        <input type="text" id="calc-display" disabled placeholder="0">
+        <div class="calc-grid">
+            <button onclick="appendVal('7')">7</button>
+            <button onclick="appendVal('8')">8</button>
+            <button onclick="appendVal('9')">9</button>
+            <button class="btn-op" onclick="appendVal('/')">/</button>
+
+            <button onclick="appendVal('4')">4</button>
+            <button onclick="appendVal('5')">5</button>
+            <button onclick="appendVal('6')">6</button>
+            <button class="btn-op" onclick="appendVal('*')">*</button>
+
+            <button onclick="appendVal('1')">1</button>
+            <button onclick="appendVal('2')">2</button>
+            <button onclick="appendVal('3')">3</button>
+            <button class="btn-op" onclick="appendVal('-')">-</button>
+
+            <button onclick="appendVal('0')">0</button>
+            <button onclick="appendVal('.')">.</button>
+            <button class="btn-op" onclick="appendVal('%')">%</button>
+            <button class="btn-op" onclick="appendVal('+')">+</button>
+
+            <button class="btn-op" onclick="appendVal('^')">^</button>
+            <button class="btn-op" title="Integer Division" onclick="appendVal('\\')">\</button>
+            <button class="btn-clear" onclick="clearCalc()">C</button>
+
+            <button class="btn-equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('calc-display');
+
+        function appendVal(val) {
+            if (display.value === 'Error' || display.value === 'NaN') {
+                display.value = '';
+            }
+            display.value += val;
+        }
+
+        function clearCalc() {
+            display.value = '';
+        }
+
+        function calculate() {
+            try {
+                let expression = display.value;
+                if (!expression) return;
+
+                expression = expression.replace(/\^/g, '**');
+
+                while (expression.includes('\\')) {
+                    expression = expression.replace(/(\d+\.?\d*)\s*\\\s*(\d+\.?\d*)/, function(match, num1, num2) {
+                        const divisor = parseFloat(num2);
+                        if (divisor === 0) throw new Error("Divide by zero");
+                        return Math.floor(parseFloat(num1) / divisor);
+                    });
+                }
+
+                const result = eval(expression);
+                
+                if (result === undefined || isNaN(result) || !isFinite(result)) {
+                    display.value = 'Error';
+                } else {
+                    display.value = parseFloat(result.toFixed(4)); 
+                }
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+    </script>
+</body>
+</html>
